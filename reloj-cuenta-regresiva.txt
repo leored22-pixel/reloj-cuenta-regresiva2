@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reloj de Cuenta Regresiva</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #time-display {
+      font-size: 80px;
+      margin: 20px;
+      transition: color 0.5s;
+    }
+
+    .controls {
+      margin: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 18px;
+      width: 100px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Cuenta Regresiva</h1>
+
+  <input type="number" id="time-input" min="1" max="300" placeholder="Segundos" />
+  
+  <div id="time-display">00:00</div>
+
+  <div class="controls">
+    <button onclick="startCountdown()">Iniciar</button>
+    <button onclick="pauseCountdown()">Pausar</button>
+    <button onclick="resetCountdown()">Reiniciar</button>
+  </div>
+
+  <!-- Alarma -->
+  <audio id="alarm-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
+
+  <script>
+    let countdown;
+    let remainingTime = 0;
+    let isRunning = false;
+
+    const timeInput = document.getElementById('time-input');
+    const timeDisplay = document.getElementById('time-display');
+    const alarmSound = document.getElementById('alarm-sound');
+
+    function updateDisplay() {
+      let minutes = Math.floor(remainingTime / 60);
+      let seconds = remainingTime % 60;
+      timeDisplay.textContent = 
+        String(minutes).padStart(2, '0') + ":" + String(seconds).padStart(2, '0');
+
+      // Cambiar color aleatorio
+      timeDisplay.style.color = "#" + Math.floor(Math.random()*16777215).toString(16);
+    }
+
+    function startCountdown() {
+      if (isRunning) return;
+
+      if (!remainingTime) {
+        let inputSeconds = parseInt(timeInput.value);
+        if (isNaN(inputSeconds) || inputSeconds < 1 || inputSeconds > 300) {
+          alert("Ingresa un tiempo entre 1 y 300 segundos.");
+          return;
+        }
+        remainingTime = inputSeconds;
+      }
+
+      isRunning = true;
+      countdown = setInterval(() => {
+        if (remainingTime > 0) {
+          remainingTime--;
+          updateDisplay();
+        } else {
+          clearInterval(countdown);
+          isRunning = false;
+          alarmSound.play();
+        }
+      }, 1000);
+
+      updateDisplay();
+    }
+
+    function pauseCountdown() {
+      clearInterval(countdown);
+      isRunning = false;
+    }
+
+    function resetCountdown() {
+      clearInterval(countdown);
+      isRunning = false;
+      remainingTime = 0;
+      timeDisplay.textContent = "00:00";
+      timeDisplay.style.color = "white";
+    }
+  </script>
+
+</body>
+</html>
